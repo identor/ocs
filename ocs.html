@@ -9,14 +9,12 @@
 
   <h1>My Online Store</h1>
   <section id="menu"></section>
-  <div class="bordered" id="product-view">
-    <h2>Products</h2>
-  </div>
-  <section class="bordered">
-    <span>Cart Php. <span id="cart-total-cost"></span></span>
+  <div class="bordered" id="product-view"></div>
+  <section id="cart" class="bordered">
+    <h2>Cart Php. <span id="cart-total-cost"></span></h2>
     <div id="cart-items">
-      
     </div>
+    <button onclick="javascript: finishShopping()">Checkout</button>
   </section>
 
   <script type="text/javascript">
@@ -24,8 +22,17 @@
     const $cartItems = document.querySelector('#cart-items');
     const $productView = document.querySelector('#product-view');
     const $menu = document.querySelector('#menu');
+    const $cart = document.querySelector('#cart');
     const jsonUrl = 'res/data.json';
     var cartTotalCost = 0;
+
+    function finishShopping() {
+      cartTotalCoast = 0;
+      updateTotalCost();
+
+      showProducts([]);
+      $cartItems.innerHTML = 'Items will be delivered soon.';
+    }
 
     function updateTotalCost() {
       $cartTotalCost.innerHTML = parseFloat(cartTotalCost).toFixed(2);
@@ -61,7 +68,7 @@
       products.forEach(product => {
         var productDiv = document.createElement('div');
         productDiv.innerHTML = `
-          <h3>${product.description}</h3>
+          <h3>${product.description} - Php. ${parseFloat(product.price).toFixed(2)}</h3>
           <img src="${product.imageURL}">
         `;
 
