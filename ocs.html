@@ -1,0 +1,97 @@
+<!Doctype html>
+<html>
+<body>
+  <style type="text/css">
+    .bordered {
+      border: 1px solid black;
+    }
+  </style>
+
+  <h1>My Online Store</h1>
+  <section id="menu"></section>
+  <div class="bordered" id="product-view">
+    <h2>Products</h2>
+  </div>
+  <section class="bordered">
+    <span>Cart Php. <span id="cart-total-cost"></span></span>
+    <div id="cart-items">
+      
+    </div>
+  </section>
+
+  <script type="text/javascript">
+    const $cartTotalCost = document.querySelector('#cart-total-cost');
+    const $cartItems = document.querySelector('#cart-items');
+    const $productView = document.querySelector('#product-view');
+    const $menu = document.querySelector('#menu');
+    const jsonUrl = 'res/data.json';
+    var cartTotalCost = 0;
+
+    function updateTotalCost() {
+      $cartTotalCost.innerHTML = parseFloat(cartTotalCost).toFixed(2);
+    }
+
+    function fetchProducts() {
+      return window.fetch(jsonUrl).then((res) => { return res.json(); });
+    }
+
+    function addToCart(product) {
+      cartTotalCost += product.price;
+      updateTotalCost();
+
+      function createOnRemove(product, el) {
+        return () => {
+          cartTotalCost -= product.price;
+          updateTotalCost();
+          $cartItems.removeChild(el);
+        };
+      }
+
+      var div = document.createElement('div');
+      div.innerHTML = `
+          <p>${product.description} - Php. ${parseFloat(product.price).toFixed(2)} <button>Remove</button></p>
+      `;
+
+      div.querySelector('button').onclick = createOnRemove(product, div);
+      $cartItems.appendChild(div);
+    }
+
+    function showProducts(products) {
+      $productView.innerHTML = '';
+      products.forEach(product => {
+        var productDiv = document.createElement('div');
+        productDiv.innerHTML = `
+          <h3>${product.description}</h3>
+          <img src="${product.imageURL}">
+        `;
+
+        var button = document.createElement('button');
+        button.innerHTML = 'Add to cart';
+        button.onclick = () => { addToCart(product) };
+        productDiv.appendChild(button);
+
+        productDiv.className += 'bordered';
+        $productView.appendChild(productDiv);
+      });
+    }
+
+    // main
+    (() => {
+      updateTotalCost();
+      fetchProducts().then(res => {
+        let categories = res.map(el => { return el.category }).filter((el, i, a) => { return i === a.indexOf(el) });
+
+        categories.forEach(category => {
+          let button = document.createElement('button');
+          button.innerHTML = category;
+          button.onclick = () => {
+            showProducts(res.filter(product =>  { return product.category === category; }));
+          };
+
+          $menu.appendChild(button);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
