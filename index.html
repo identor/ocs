@@ -1,0 +1,212 @@
+<!--
+    NOTE:  
+    * Edit this file to implement the expected functionality of the indicated application.
+    
+    * All code (i.e., HTML, CSS, JavaScript) must be contained in this file, and must be 
+      the group's ORIGINAL WORK.  PLAGIARIZED work, both the ORIGINAL and the COPY, will
+      get NO CREDIT.
+
+    * Use embedded code comments to label each code section with the name of the member of 
+      the group who is responsible for that code section.  All essential code sections must 
+      be labeled properly.
+
+    * Use appropriate code documentation to provide brief descriptions/explanations of each
+      essential code section.
+
+    * Use only 'vanilla' HTML, CSS, and JavaScript in your code (i.e., 3rd-party libraries
+      or frameworks must not be used).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Online Convenience Store</title>
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="favicon.ico">
+
+    <script defer>
+        /* use this function to fetch the specified file (assumed to be a text-format
+             data file located in the 'res' folder) using AJAX, returning the file's
+             contents when successful, or 'undefined' otherwise.. */
+        function getDataFile(filename) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "res/" + filename, false);
+            xhr.send();
+            if (xhr.status == 200) {
+                return xhr.responseText;
+            }
+        }
+        var data = JSON.parse(getDataFile("data.json"));
+
+        function generateCategory() {
+          var catStack = [];
+          for(i = 0; i< data.length; i++){    
+              if(catStack.indexOf(data[i].category) === -1){
+                  catStack.push(data[i].category);        
+              }        
+          }
+
+          for(i = 0; i< catStack.length; i++){    
+              var cat_div = document.createElement("div");
+              var catList = document.createElement("p");
+
+              var t = document.createTextNode(catStack[i]);
+              catList.appendChild(t);
+              cat_div.appendChild(catList);
+              cat_div.onclick = generateItems(catStack[i]);
+              
+              document.getElementById("cat").appendChild(cat_div);
+
+          }
+        }
+
+        function generateItems(cat) {
+
+          return function() { 
+            clearItems();
+            for(i = 0; i< data.length; i++){    
+                if(data[i].category === cat){
+                  var item_div = document.createElement("div");
+                  var image = document.createElement("img");
+                  var desc = document.createElement("p");
+                  var d = document.createTextNode(data[i].description);
+
+                  item_div.setAttribute("id", "item_div");
+                  image.setAttribute("src",data[i].imageURL);
+              
+                  item_div.appendChild(image);
+                  desc.appendChild(d);
+                  item_div.appendChild(desc);
+                  item_div.onclick = addToCart(data[i].description, data[i].price);
+                  document.getElementById("item").appendChild(item_div);
+                }        
+            }
+          };
+        }
+
+
+        function addToCart(des, price) {
+
+          return function() { 
+
+              var itemList = document.createElement("p");
+              var itemDesc = document.createTextNode(des);
+              itemList.appendChild(itemDesc);
+              var sum = document.getElementById("total").innerHTML;
+              sum = parseFloat(sum);
+              sum = sum + parseFloat(price);
+              itemList.onclick = function removeToCart() {
+                    this.parentNode.removeChild(this);
+                    var sum = document.getElementById("total").innerHTML;
+                    sum = sum - parseFloat(price)
+                    document.getElementById("total").innerHTML = sum;
+                }
+
+              document.getElementById("list").appendChild(itemList);
+              document.getElementById("total").innerHTML = sum;
+              
+          };
+        }
+
+        function clearItems() {
+            var clear = document.getElementById("item");
+            while (clear.firstChild) {
+                clear.removeChild(clear.firstChild);
+            }
+        }
+
+        function checkout() {
+
+          return function() { 
+
+            var removeCont = document.getElementById("container");
+            while (removeCont.firstChild) {
+                removeCont.removeChild(removeCont.firstChild);
+            }
+
+            var goodbye = document.createElement("h1");
+            var g = document.createTextNode("Your orders will be deliver shortly. Thank you!")
+            goodbye.appendChild(g);
+
+            removeCont.appendChild(goodbye);
+
+           document.createElement("button_id").innerHTML = "New Transaction";
+
+          };
+        }
+
+
+        window.onload = function() {
+          
+
+          // Create Structure
+          var header = document.createElement("div");
+          var title = document.createElement("h1");
+          var button = document.createElement("button");
+          var button_text = document.createTextNode("Checkout");
+          var title_text = document.createTextNode("MYOCS")
+          title.appendChild(title_text);
+          button.appendChild(button_text);
+          button.setAttribute("id","button_id")
+          header.appendChild(title);
+          header.appendChild(button);
+          header.setAttribute("id","header");
+          header.style.backgroundColor = "blue";
+          header.style.width = "100%";
+          button.onclick=checkout();
+
+
+          var container = document.createElement("div");
+          container.setAttribute("id","container");
+          container.style.backgroundColor = "green";
+          container.style.width = "100%";
+
+          var category = document.createElement("div");
+          category.setAttribute("id","cat");
+          category.style.backgroundColor = "red";
+          category.style.width = "20%";
+          category.style.align="left";
+          
+          var item = document.createElement("div");
+          item.setAttribute("id","item");
+          item.style.backgroundColor = "white";
+          item.style.width = "auto";
+          item.style.align="center";
+          
+          var cart = document.createElement("div");
+          var totalPrice = document.createElement("p");
+          var p = document.createTextNode("0.0");
+          var cartList = document.createElement("div");
+          totalPrice.setAttribute("id","total");
+          cartList.setAttribute("id","list");
+          cart.setAttribute("id","cart");
+          cart.style.backgroundColor = "white";
+          cart.style.width = "10%";
+          cart.style.border = "5px";
+          cart.style.align="right";
+          
+          totalPrice.appendChild(p);
+          cart.appendChild(totalPrice);
+          cart.appendChild(cartList);
+
+          container.appendChild(category);
+          container.appendChild(item);
+          container.appendChild(cart);
+          document.body.appendChild(header);
+          document.body.appendChild(container);
+
+          generateCategory();
+        
+        }
+
+
+    </script>
+</head>
+
+<body>
+<nav>
+  <h1>OCS</h1>
+</nav>
+<div>category</div>
+<div><p onclick="id","cat">categ</p></div>
+</body>
+</html>
